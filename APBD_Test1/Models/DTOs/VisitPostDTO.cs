@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace APBD_Test1.Models.DTOs;
 

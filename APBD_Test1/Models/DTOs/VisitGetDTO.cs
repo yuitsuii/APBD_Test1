@@ -1,6 +1,6 @@
 namespace APBD_Test1.Models.DTOs;
 
-public class VisitRequestDTO
+public class VisitGetDTO
 {
     public DateTime Date {get; set;}
     public ClientDTO Client {get; set;}

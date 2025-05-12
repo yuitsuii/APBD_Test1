@@ -8,7 +8,7 @@ public class VisitService : IVisitService
 {
     private readonly string _connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=APBD_test1;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
-    public async Task<VisitRequestDTO> GetVisit(int visitId)
+    public async Task<VisitGetDTO> GetVisit(int visitId)
     {
         var query = @"
         SELECT v.date, c.first_name, c.last_name, c.date_of_birth, m.mechanic_id, m.licence_number,s.name, vs.service_fee FROM Visit v 
@@ -24,10 +24,10 @@ public class VisitService : IVisitService
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
 
-            VisitRequestDTO? visit = null;
+            VisitGetDTO? visit = null;
             while (await reader.ReadAsync())
             {
-                visit ??= new VisitRequestDTO
+                visit ??= new VisitGetDTO
                 {
                     Date = reader.GetDateTime(0),
                     Client = new ClientDTO
@@ -51,7 +51,7 @@ public class VisitService : IVisitService
                 });
             }
 
-            return visit ?? throw new KeyNotFoundException($"Visit {visitId} not found.");
+            return visit ?? throw new KeyNotFoundException($"Visit with id: {visitId} not found.");
         }
         catch (SqlException ex)
         {
@@ -96,7 +96,7 @@ public class VisitService : IVisitService
                 mechanicCommand.Parameters.AddWithValue("@licence_number", visit.LicenceNumber);
                 mechanicId = await mechanicCommand.ExecuteScalarAsync() as int?;
                 if (mechanicId == null)
-                    throw new KeyNotFoundException("Mechanic not found");
+                    throw new KeyNotFoundException("Mechanic with given licence not found");
             }
 
             var insertVisitQuery = @"INSERT INTO Visit (visit_id, client_id, mechanic_id, date) 
@@ -151,9 +151,4 @@ public class VisitService : IVisitService
             throw;
         }
     }
-
-    
-            
-    
-    
 }
